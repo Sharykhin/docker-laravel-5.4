@@ -1,0 +1,33 @@
+version: '2'
+services:
+    web:
+        build: .docker/nginx
+        volumes:
+            - ./:/var/www
+        ports:
+            - "8080:80"
+        links:
+            - app
+    app:
+        build: .docker/app
+        volumes:
+            - ./:/var/www
+        links:
+            - database
+            - cache
+        environment:
+            - "DB_PORT=3306"
+            - "DB_HOST=database"
+            - "REDIS_PORT=6379"
+            - "REDIS_HOST=cache"
+    database:
+        image: mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+          MYSQL_DATABASE: ${MYSQL_DATABASE}
+        ports:
+            - "33061:3306"
+    cache:
+        image: redis:3.0
+        ports:
+            - "63791:6379"
